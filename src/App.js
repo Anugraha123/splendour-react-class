@@ -1,28 +1,79 @@
-import React, { Component } from 'react';
-import logo from './logo.svg';
-import './App.css';
+import React, {useState} from 'react'
+import {
+	BrowserRouter as Router,
+	Route,
+	Link,
+	NavLink
+} from 'react-router-dom'
 
-class App extends Component {
-  render() {
-    return (
-      <div className="App">
-        <header className="App-header">
-          <img src={logo} className="App-logo" alt="logo" />
-          <p>
-            Edit <code>src/App.js</code> and save to reload.
-          </p>
-          <a
-            className="App-link"
-            href="https://reactjs.org"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Learn React
-          </a>
-        </header>
-      </div>
-    );
-  }
+const App = () => {
+	const [refresh, setRefresh] = useState(false)
+
+	console.log('refresh', refresh)
+
+	return (
+		<Router keyLength={0} forceRefresh={refresh}>
+			<div>
+				<NavLink
+					exact
+					isActive={(match) => {
+						console.log(match)
+					}}
+					to='/menu'
+					activeStyle={{
+						fontWeight: 'bold',
+						color: 'red'
+					}}
+				>
+					Menu
+				</NavLink>
+
+				<Route path='/menu' component={Menu}/>
+
+				<button onClick={() => setRefresh(true)}>refresh</button>
+			</div>
+		</Router>
+	)
 }
 
-export default App;
+const Menu = ({match}) => {
+	return (
+		<ul>
+			<li>
+				<Link to={`${match.url}/momo`}>Momo</Link>
+			</li>
+
+			<Route
+				path={`${match.path}/momo`}
+				component={Momo}
+			/>
+		</ul>
+	)
+}
+
+const Momo = ({match}) => {
+	return (
+		<ul>
+			<li><Link to={`${match.url}/buff`} innerRef={refCall}>Buff</Link></li>
+			<li><Link to={`${match.url}/chicken`}>Chicken</Link></li>
+
+			<Route
+				path={`${match.path}/:type`}
+				component={Ordered}
+			/>
+		</ul>
+	)
+}
+
+function refCall(node) {
+	console.log(node)
+}
+
+const Ordered = ({match, ...rest}) => {
+	console.log(match, rest)
+	return (
+		<h1>{match.params.type} momo is ordered</h1>
+	)
+}
+
+export default App
